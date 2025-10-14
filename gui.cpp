@@ -104,9 +104,9 @@ void update_info() {
     gtk_label_set_text(GTK_LABEL(app_data.white_count_label), ss4.str().c_str());
     
     if (app_data.is_my_turn) {
-        gtk_label_set_text(GTK_LABEL(app_data.status_label), "輪到你了！");
+        gtk_label_set_text(GTK_LABEL(app_data.status_label), "It's your turn!");
     } else {
-        gtk_label_set_text(GTK_LABEL(app_data.status_label), "對手思考中...");
+        gtk_label_set_text(GTK_LABEL(app_data.status_label), "Waiting for opponent...");
     }
 }
 
@@ -199,7 +199,7 @@ gboolean check_network_messages(gpointer user_data) {
                 GTK_DIALOG_MODAL,
                 GTK_MESSAGE_INFO,
                 GTK_BUTTONS_OK,
-                "遊戲結束！\n%s\n\nX: %d\nO: %d",
+                "GAME OVER!\n%s\n\nX: %d\nO: %d",
                 parts[1].c_str(),
                 app_data.game->get_black_count(),
                 app_data.game->get_white_count()
