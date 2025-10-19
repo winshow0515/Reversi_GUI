@@ -66,10 +66,10 @@ void update_board() {
             gtk_style_context_remove_class(context, "valid-move");
             
             if (piece == 'X') {
-                gtk_button_set_label(GTK_BUTTON(button), "●");
+                gtk_button_set_label(GTK_BUTTON(button), "⬤");
                 gtk_style_context_add_class(context, "black-piece");
             } else if (piece == 'O') {
-                gtk_button_set_label(GTK_BUTTON(button), "●");
+                gtk_button_set_label(GTK_BUTTON(button), "⬤");
                 gtk_style_context_add_class(context, "white-piece");
             } else {
                 gtk_button_set_label(GTK_BUTTON(button), "");
@@ -106,7 +106,7 @@ void update_info() {
     if (app_data.is_my_turn) {
         gtk_label_set_text(GTK_LABEL(app_data.status_label), "It's your turn!");
     } else {
-        gtk_label_set_text(GTK_LABEL(app_data.status_label), "Waiting for opponent...");
+        gtk_label_set_text(GTK_LABEL(app_data.status_label), "Waiting for opponent's move...");
     }
 }
 
@@ -199,7 +199,7 @@ gboolean check_network_messages(gpointer user_data) {
                 GTK_DIALOG_MODAL,
                 GTK_MESSAGE_INFO,
                 GTK_BUTTONS_OK,
-                "GAME OVER!\n%s\n\nX: %d\nO: %d",
+                "Game Over!\n%s\n\nX: %d\nO: %d",
                 parts[1].c_str(),
                 app_data.game->get_black_count(),
                 app_data.game->get_white_count()
@@ -369,6 +369,7 @@ void create_ui() {
     gtk_grid_attach(GTK_GRID(connect_grid), app_data.name_entry, 1, 2, 1, 1);
     
     app_data.connect_button = gtk_button_new_with_label("Connect");
+    gtk_style_context_add_class(gtk_widget_get_style_context(app_data.connect_button), "connect-btn");  // 加這行！
     g_signal_connect(app_data.connect_button, "clicked", G_CALLBACK(on_connect_clicked), NULL);
     gtk_grid_attach(GTK_GRID(connect_grid), app_data.connect_button, 0, 3, 2, 1);
     
@@ -389,7 +390,7 @@ void create_ui() {
     
     app_data.history_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(app_data.history_view));
     
-    // 載入 CSS 樣式
+// 載入 CSS 樣式
     GtkCssProvider* css_provider = gtk_css_provider_new();
     const char* css_data = 
         "* { "
@@ -397,39 +398,76 @@ void create_ui() {
         "} "
         "button { "
         "  background-image: none; "
-        "  background-color: #228B22; "  // 深綠色棋盤
+        "  background-color: #228B22; "
         "  border: 2px solid #145214; "
         "  border-radius: 0px; "
-        "  font-size: 32px; "
+        "  font-size: 50px; "
         "  font-weight: bold; "
-        "  color: #808080; "
+        "  color: #ffffffff; "
         "  min-width: 60px; "
         "  min-height: 60px; "
+        "  max-width: 60px; "              // 限制最大寬度
+        "  max-height: 60px; "             // 限制最大高度
         "  padding: 0; "
+        "  margin: 0; "
         "  box-shadow: none; "
+        "  line-height: 0.8; "             // 減少行高！
+        "} "
+        "button label { "                  // 按鈕內的文字標籤
+        "  margin: 0; "
+        "  padding: 0; "
+        "  line-height: 0.8; "             // 文字行高
         "} "
         "button:hover { "
         "  background-image: none; "
-        "  background-color: #32CD32; "  // 懸停時亮綠色
+        "  background-color: #32CD32; "
         "} "
         "button.black-piece { "
         "  background-image: none; "
-        "  color: #000000; "              // 黑色棋子
+        "  color: #000000; "
         "  background-color: #228B22; "
+        "  font-size: 45px; "
+        "  line-height: 0.7; "             // 更緊密
         "} "
         "button.white-piece { "
         "  background-image: none; "
-        "  color: #FFFFFF; "              // 白色棋子
+        "  color: #FFFFFF; "
         "  background-color: #228B22; "
-        "  text-shadow: 0 0 3px #000000; "  // 加陰影讓白色更明顯
+        "  font-size: 45px; "
+        "  line-height: 0.7; "             // 更緊密
+        "  text-shadow: 0 0 6px #000000; "
         "} "
         "button.valid-move { "
         "  background-image: none; "
-        "  color: #FFD700; "              // 金黃色提示
+        "  color: #FFD700; "
         "  font-size: 24px; "
         "  background-color: #2E8B2E; "
+        "  font-weight: bold; "
+        "} "
+        "button.connect-btn { "              // Connect 按鈕的專屬樣式
+        "  background-color: #4CAF50; "      // 綠色背景
+        "  color: #000000; "                 // 黑色文字
+        "  font-size: 14px; "                // 小字體
+        "  font-weight: normal; "            // 正常粗細
+        "  min-width: 100px; "               // 取消最小寬度限制
+        "  min-height: 30px; "               // 正常按鈕高度
+        "  max-width: none; "                // 取消最大寬度限制
+        "  max-height: none; "               // 取消最大高度限制
+        "  padding: 5px 15px; "              // 加上內邊距
+        "  border-radius: 3px; "             // 圓角
+        "  line-height: normal; "            // 正常行高
+        "} "
+        "button.connect-btn:hover { "
+        "  background-color: #45a049; "      // 懸停時深一點的綠色
+        "} "
+        "headerbar button.close { "
+        "  background-color: #DC143C; "
+        "  color: white; "
+        "} "
+        "headerbar button.close:hover { "
+        "  background-color: #FF0000; "
         "}";
-    
+
     gtk_css_provider_load_from_data(css_provider, css_data, -1, NULL);
     gtk_style_context_add_provider_for_screen(
         gdk_screen_get_default(),
